@@ -693,45 +693,72 @@ def main():
                         display_swacchta_index(100, 0)
                         st.caption("Clean Video - No Garbage Detected")
                 
-                # Display annotated video (full width)
+                # Create tabs for video results
                 st.markdown("---")
-                st.subheader("🎬 Annotated Video Results")
+                tab1, tab2 = st.tabs(["📊 Analysis Results", "🎬 Annotated Video"])
                 
-                # Wait a moment for file to be fully written
-                time.sleep(1)
-                
-                try:
-                    # Display video using file path (better for Streamlit)
-                    st.video(output_video_path)
+                with tab1:
+                    st.subheader("📋 Detailed Analysis Results")
                     
-                    # Also provide download option
-                    with open(output_video_path, 'rb') as video_file:
-                        video_bytes = video_file.read()
-                        st.download_button(
-                            label="💾 Download Annotated Video",
-                            data=video_bytes,
-                            file_name=f"garbage_detection_result_{uploaded_video.name}",
-                            mime="video/mp4"
-                        )
-                except Exception as e:
-                    st.error(f"Error displaying video: {e}")
-                    st.info("Video was processed but couldn't be displayed. Try the download button.")
+                    if frame_detections:
+                        # Count detections by class
+                        class_counts = {}
+                        for det in frame_detections:
+                            class_name = det['class']
+                            class_counts[class_name] = class_counts.get(class_name, 0) + 1
+                        
+                        col_summary, col_stats = st.columns(2)
+                        
+                        with col_summary:
+                            st.write("**🗑️ Detection Summary:**")
+                            for class_name, count in class_counts.items():
+                                st.write(f"• {class_name}: {count} detections")
+                            
+                            st.write(f"\n**📊 Total Objects:** {len(frame_detections)}")
+                            st.write(f"**🎬 Frames Processed:** {processed_frames}/{total_frames}")
+                        
+                        with col_stats:
+                            st.write("**⏱️ Processing Statistics:**")
+                            total_time = time.time() - start_time
+                            st.metric("Processing Time", f"{total_time:.1f}s")
+                            st.metric("Processing Speed", f"{processed_frames/total_time:.1f} FPS")
+                            st.metric("Frame Skip Rate", f"1:{frame_skip}")
+                    
+                    else:
+                        st.info("✅ **Clean Video** - No garbage detected in any processed frames")
+                        total_time = time.time() - start_time
+                        st.write(f"**⏱️ Processing completed in {total_time:.1f} seconds**")
+                        st.write(f"**📊 Processed {processed_frames} frames out of {total_frames} total frames**")
                 
-                if not frame_detections:
-                    st.info("✅ No garbage detected in the video")
-                
-                # Show processing statistics
-                st.markdown("---")
-                st.subheader("⏱️ Processing Statistics")
-                total_time = time.time() - start_time
-                
-                stats_col1, stats_col2, stats_col3 = st.columns(3)
-                with stats_col1:
-                    st.metric("Processing Time", f"{total_time:.1f}s")
-                with stats_col2:
-                    st.metric("Frames Processed", f"{processed_frames}")
-                with stats_col3:
-                    st.metric("Total Frames", f"{total_frames}")
+                with tab2:
+                    st.subheader("🎬 Annotated Video Player")
+                    
+                    # Wait a moment for file to be fully written
+                    time.sleep(1)
+                    
+                    try:
+                        # Display video using file path (better for Streamlit)
+                        st.video(output_video_path)
+                        
+                        # Provide download option
+                        with open(output_video_path, 'rb') as video_file:
+                            video_bytes = video_file.read()
+                            st.download_button(
+                                label="💾 Download Annotated Video",
+                                data=video_bytes,
+                                file_name=f"garbage_detection_result_{uploaded_video.name}",
+                                mime="video/mp4",
+                                use_container_width=True
+                            )
+                        
+                        if frame_detections:
+                            st.success(f"✅ Video processed successfully with {len(frame_detections)} total detections")
+                        else:
+                            st.info("ℹ️ Video processed - no garbage detected")
+                            
+                    except Exception as e:
+                        st.error(f"❌ Error displaying video: {e}")
+                        st.info("Video was processed but couldn't be displayed. Try the download button.")
                 
                 # Clean up input video file
                 try:
@@ -779,7 +806,7 @@ def main():
                         swacchta_scores.append(swacchta_index)
                         
                         # Display result
-                        with results_container.expander(f"📸 {img_file.name} - {'🗑️ GARBAGE FOUND' if detections else '✅ CLEAN'} - Swacchta: {swacchta_index}"):
+                        with results_container.expander(f"📸 {img_file.name} - {'🗑️ GARBAGE FOUND' if detections else '✅ CLEAN'} - SI: {swacchta_index}"):
                             if annotated_img is not None:
                                 col1, col2, col3 = st.columns([2, 2, 1])
                                 with col1:
@@ -787,83 +814,81 @@ def main():
                                 with col2:
                                     st.image(annotated_img, caption="Detection Results", use_column_width=True)
                                 with col3:
-                                    # Mini Swacchta Index display
-                                    grade, description = get_swacchta_grade(swacchta_index)[:2]
-                                    st.metric("Swacchta Index", f"{swacchta_index}", f"Grade: {grade}")
-                                    st.caption(description)
+                                    # Display Swacchta Index
+                                    st.metric("Swacchta Index", f"{swacchta_index}", f"Grade: {get_swacchta_grade(swacchta_index)[0]}")
                                 
                                 if detections:
                                     st.write("**Detected Objects:**")
                                     for det in detections:
                                         st.write(f"• {det['class']} ({det['confidence']:.1%})")
+                    
+                    # Calculate overall area statistics
+                    overall_swacchta = sum(swacchta_scores) / len(swacchta_scores)
+                    best_swacchta_score = max(swacchta_scores)
+                    worst_swacchta_score = min(swacchta_scores)
+                    
+                    # Summary
+                    st.markdown("---")
+                    st.header("📊 Area Processing Summary")
+                    
+                    # Top metrics
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        st.metric("Total Images", len(image_files))
+                    with col2:
+                        st.metric("Images with Garbage", images_with_garbage)
+                    with col3:
+                        st.metric("Total Objects Detected", total_detections)
+                    with col4:
+                        st.metric("Clean Images", len(image_files) - images_with_garbage)
+                    
+                    # Overall Swacchta Index Assessment
+                    st.markdown("---")
+                    st.subheader("🏛️ Overall Area Swacchta Assessment")
+                    
+                    col_main, col_stats = st.columns([2, 1])
+                    
+                    with col_main:
+                        display_swacchta_index(overall_swacchta, total_detections)
+                        st.caption("Average cleanliness across all surveyed locations")
+                    
+                    with col_stats:
+                        st.write("**📈 Area Statistics:**")
+                        st.metric("Best Location", f"{best_swacchta_score:.1f}")
+                        st.metric("Worst Location", f"{worst_swacchta_score:.1f}")
+                        st.metric("Cleanliness Variation", f"{best_swacchta_score - worst_swacchta_score:.1f}")
                         
-                        # Calculate overall area statistics
-                        overall_swacchta = sum(swacchta_scores) / len(swacchta_scores)
-                        best_image_score = max(swacchta_scores)
-                        worst_image_score = min(swacchta_scores)
-                        
-                        # Summary
-                        st.markdown("---")
-                        st.header("📊 Area Processing Summary")
-                        
-                        # Top metrics
-                        col1, col2, col3, col4 = st.columns(4)
-                        with col1:
-                            st.metric("Total Images", len(image_files))
-                        with col2:
-                            st.metric("Images with Garbage", images_with_garbage)
-                        with col3:
-                            st.metric("Total Objects Detected", total_detections)
-                        with col4:
-                            st.metric("Clean Images", len(image_files) - images_with_garbage)
-                        
-                        # Overall Swacchta Index
-                        st.markdown("---")
-                        st.subheader("🏛️ Overall Area Swacchta Assessment")
-                        
-                        col_main, col_stats = st.columns([2, 1])
-                        
-                        with col_main:
-                            display_swacchta_index(overall_swacchta, total_detections)
-                            st.caption("Average cleanliness across all surveyed locations")
-                        
-                        with col_stats:
-                            st.write("**📈 Area Statistics:**")
-                            st.metric("Best Location", f"{best_image_score:.1f}")
-                            st.metric("Worst Location", f"{worst_image_score:.1f}")
-                            st.metric("Cleanliness Variation", f"{best_image_score - worst_image_score:.1f}")
-                            
-                            # Calculate percentage
-                            garbage_percentage = (images_with_garbage / len(image_files)) * 100
-                            st.metric("Locations with Issues", f"{garbage_percentage:.1f}%")
-                        
-                        # Area assessment
-                        if overall_swacchta >= 80:
-                            st.success("🌟 **EXCELLENT AREA** - This location maintains high cleanliness standards!")
-                        elif overall_swacchta >= 60:
-                            st.warning("⚠️ **NEEDS ATTENTION** - Some areas require cleaning intervention.")
-                        else:
-                            st.error("🚨 **CRITICAL AREA** - Immediate cleaning and maintenance required!")
-                        
-                        # Recommendations
-                        st.markdown("---")
-                        st.subheader("💡 Recommendations")
-                        
-                        if garbage_percentage > 50:
-                            st.write("🔧 **Immediate Actions Needed:**")
-                            st.write("• Deploy cleaning teams to high-garbage areas")
-                            st.write("• Install additional waste bins")
-                            st.write("• Consider awareness campaigns")
-                        elif garbage_percentage > 20:
-                            st.write("🔧 **Preventive Measures:**")
-                            st.write("• Regular monitoring of identified problem areas")
-                            st.write("• Increase cleaning frequency")
-                            st.write("• Community engagement programs")
-                        else:
-                            st.write("✅ **Maintenance Mode:**")
-                            st.write("• Continue current cleaning schedule")
-                            st.write("• Monitor for seasonal changes")
-                            st.write("• Maintain community awareness")
+                        # Calculate percentage
+                        garbage_percentage = (images_with_garbage / len(image_files)) * 100
+                        st.metric("Locations with Issues", f"{garbage_percentage:.1f}%")
+                    
+                    # Area assessment based on Swacchta Index
+                    if overall_swacchta >= 80:
+                        st.success("🌟 **EXCELLENT AREA** - High cleanliness standards maintained!")
+                    elif overall_swacchta >= 60:
+                        st.warning("⚠️ **NEEDS ATTENTION** - Area requires cleaning intervention.")
+                    else:
+                        st.error("🚨 **CRITICAL AREA** - Immediate cleaning and maintenance required!")
+                    
+                    # Recommendations
+                    st.markdown("---")
+                    st.subheader("💡 Recommendations")
+                    
+                    if garbage_percentage > 50:
+                        st.write("🔧 **Immediate Actions Needed:**")
+                        st.write("• Deploy cleaning teams to high-garbage areas")
+                        st.write("• Install additional waste bins")
+                        st.write("• Consider awareness campaigns")
+                    elif garbage_percentage > 20:
+                        st.write("🔧 **Preventive Measures:**")
+                        st.write("• Regular monitoring of identified problem areas")
+                        st.write("• Increase cleaning frequency")
+                        st.write("• Community engagement programs")
+                    else:
+                        st.write("✅ **Maintenance Mode:**")
+                        st.write("• Continue current cleaning schedule")
+                        st.write("• Monitor for seasonal changes")
+                        st.write("• Maintain community awareness")
 
 if __name__ == "__main__":
     main() 
