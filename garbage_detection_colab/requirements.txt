@@ -1,0 +1,8 @@
+roboflow
+ultralytics
+pillow-heif==0.15.0
+numpy<2.0.0
+torch
+torchvision
+opencv-python
+streamlit 

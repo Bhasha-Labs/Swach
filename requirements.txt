@@ -1,0 +1,36 @@
+# Core ML/Computer Vision
+torch
+torchvision
+ultralytics
+opencv-python
+numpy
+Pillow
+
+# Data processing and augmentation
+albumentations
+scipy
+scikit-learn
+pandas
+
+# Visualization and plotting
+matplotlib
+seaborn
+plotly
+
+# Configuration and utilities
+PyYAML
+tqdm
+psutil
+
+# Dataset handling
+roboflow
+
+# Optional logging (wandb made optional)
+# wandb>=0.15.0  # Made optional - install separately if needed
+
+# Fix pydantic version for compatibility
+pydantic
+
+# Additional utilities
+requests
+urllib3 
