@@ -362,7 +362,7 @@ export default function FloatingDelegationDialog({ isOpen, onClose, areas }: Flo
                         </div>
                         <button
                           onClick={() => {
-                            setNewTask(prev => ({ ...prev, ...suggestion }))
+                            setNewTask(prev => ({ ...prev, ...suggestion, priority: 'medium' as const }))
                             setActiveView('create')
                           }}
                           className="px-3 py-1 bg-yellow-600 text-white text-xs rounded-lg hover:bg-yellow-700"

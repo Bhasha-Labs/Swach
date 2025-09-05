@@ -242,7 +242,8 @@ export default function DelegationPanel({ areas }: DelegationPanelProps) {
                         onClick={() => {
                           setNewTask(prev => ({
                             ...prev,
-                            ...suggestion
+                            ...suggestion,
+                            priority: 'medium' as const
                           }))
                           setShowCreateTask(true)
                         }}
