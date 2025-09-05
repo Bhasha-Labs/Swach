@@ -1,0 +1,191 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-lg p-6 shadow-sm border border-gray-100;
+  }
+  
+  .btn-primary {
+    @apply px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors;
+  }
+  
+  .metric-card {
+    @apply bg-white p-4 rounded-lg border border-gray-100 shadow-sm;
+  }
+  
+  .status-indicator {
+    @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+  }
+  
+  .status-excellent {
+    @apply bg-swach-100 text-swach-800;
+  }
+  
+  .status-good {
+    @apply bg-blue-100 text-blue-800;
+  }
+  
+  .status-poor {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+  
+  .status-critical {
+    @apply bg-danger-100 text-danger-800;
+  }
+
+  /* Leaflet Map Styles - Enhanced */
+  .leaflet-container {
+    @apply rounded-lg;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+  
+  .leaflet-control-container {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    pointer-events: none !important;
+  }
+  
+  .leaflet-control {
+    pointer-events: auto !important;
+    max-width: calc(100% - 20px) !important;
+  }
+
+  .leaflet-popup-content-wrapper {
+    max-width: 250px !important;
+  }
+
+  .leaflet-popup-content {
+    max-width: 220px !important;
+    overflow: hidden !important;
+  }
+
+  /* Map Container Fixes */
+  .map-container {
+    width: 100%;
+    height: 256px;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    background-color: #f3f4f6;
+    position: relative;
+  }
+
+  .map-container .leaflet-container {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0.5rem;
+    overflow: hidden !important;
+  }
+
+  /* Location Selector Map */
+  .location-selector-map {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    max-height: 400px;
+    overflow: hidden;
+    border-radius: 0.5rem;
+  }
+
+  .location-selector-map .leaflet-container {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0.5rem;
+  }
+
+  /* Floating Dialog Styles */
+  .floating-dialog {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4;
+    backdrop-filter: blur(4px);
+  }
+
+  .floating-dialog-content {
+    @apply bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden;
+    animation: slideInScale 0.3s ease-out;
+  }
+
+  @keyframes slideInScale {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Modern Dropdown Styles */
+  .modern-dropdown {
+    @apply relative inline-block;
+  }
+
+  .dropdown-content {
+    @apply absolute right-0 mt-2 w-56 rounded-xl bg-white shadow-xl border border-gray-100 z-50;
+    animation: dropdownFade 0.2s ease-out;
+  }
+
+  @keyframes dropdownFade {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Card Hover Effects */
+  .interactive-card {
+    @apply transition-all duration-300 hover:shadow-lg hover:scale-105;
+  }
+
+  /* Gradient Backgrounds */
+  .gradient-bg-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .gradient-bg-success {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
+
+  .gradient-bg-warning {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  .gradient-bg-info {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
+
+  /* Glass Effect */
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+} 
