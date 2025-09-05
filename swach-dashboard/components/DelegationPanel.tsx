@@ -186,7 +186,7 @@ export default function DelegationPanel({ areas }: DelegationPanelProps) {
               <UserGroupIcon className="h-4 w-4 text-purple-600" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900">Team Delegation</h3>
+              <h3 className="text-xl font-bold text-gray-900">Team Management</h3>
               <p className="text-sm text-gray-600">Manage tasks, team, and schedules</p>
             </div>
           </div>

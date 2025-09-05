@@ -194,7 +194,7 @@ export default function FloatingDelegationDialog({ isOpen, onClose, areas }: Flo
                 <UserGroupIcon className="h-6 w-6" />
               </div>
               <div>
-                <h2 className="text-3xl font-bold">Team Delegation</h2>
+                <h2 className="text-3xl font-bold">Team Management</h2>
                 <p className="text-blue-100 text-lg">Manage tasks and team efficiently</p>
               </div>
             </div>
@@ -207,7 +207,7 @@ export default function FloatingDelegationDialog({ isOpen, onClose, areas }: Flo
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-4 gap-6 mt-8">
+          <div className="grid grid-cols-4 gap-6 mt-8 delegation-stats">
             <div className="glass-effect p-4 rounded-lg text-center">
               <div className="text-3xl font-bold">{tasks.length}</div>
               <div className="text-sm text-blue-100">Total Tasks</div>
@@ -229,7 +229,7 @@ export default function FloatingDelegationDialog({ isOpen, onClose, areas }: Flo
 
         {/* Navigation */}
         <div className="border-b border-gray-200 px-8">
-          <nav className="flex space-x-12">
+          <nav className="flex space-x-12 delegation-tabs">
             {[
               { key: 'overview', label: 'Overview', icon: ChartBarIcon },
               { key: 'tasks', label: 'Tasks', icon: ClipboardDocumentListIcon },

@@ -574,350 +574,348 @@ export default function LiveDetection() {
 
       {/* MAIN INTERFACE SECTION */}
       <div className="max-w-6xl mx-auto p-6">
-        {/* Detection Method Selection */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden mb-8">
-          <div className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 border-b border-gray-100">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Choose Detection Method</h3>
-            <p className="text-gray-600">Select how you want to analyze for garbage detection</p>
-          </div>
-
-          <div className="p-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { key: 'camera', icon: CameraIcon, label: 'Live Camera', desc: 'Real-time capture' },
-                { key: 'upload', icon: PhotoIcon, label: 'Upload Image', desc: 'Single image analysis' },
-                { key: 'video', icon: VideoCameraIcon, label: 'Video Analysis', desc: 'Process video files' },
-                { key: 'bulk', icon: FolderIcon, label: 'Bulk Process', desc: 'Multiple images' }
-              ].map(({ key, icon: Icon, label, desc }) => (
-                <button
-                  key={key}
-                  onClick={() => setActiveMethod(key as any)}
-                  className={`p-6 rounded-xl border-2 transition-all duration-200 text-left group ${
-                    activeMethod === key
-                      ? 'border-blue-500 bg-blue-50 shadow-lg'
-                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
-                  }`}
-                >
-                  <Icon className={`h-8 w-8 mb-3 ${
-                    activeMethod === key ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'
-                  }`} />
-                  <div className={`font-semibold mb-1 ${
-                    activeMethod === key ? 'text-blue-900' : 'text-gray-900'
-                  }`}>
-                    {label}
-                  </div>
-                  <div className="text-sm text-gray-500">{desc}</div>
-                </button>
-              ))}
-            </div>
+        {/* Method Selection */}
+        <div className="mb-8 detection-methods">
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">Choose Detection Method</h3>
+          <p className="text-gray-600 mb-6">Select your preferred detection method and configure settings</p>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            {[
+              { key: 'camera', icon: CameraIcon, label: 'Live Camera', desc: 'Real-time capture' },
+              { key: 'upload', icon: PhotoIcon, label: 'Upload Image', desc: 'Single image analysis' },
+              { key: 'video', icon: VideoCameraIcon, label: 'Video Analysis', desc: 'Process video files' },
+              { key: 'bulk', icon: FolderIcon, label: 'Bulk Process', desc: 'Multiple images' }
+            ].map(({ key, icon: Icon, label, desc }) => (
+              <button
+                key={key}
+                onClick={() => setActiveMethod(key as any)}
+                className={`p-6 rounded-xl border-2 transition-all duration-200 text-left group ${
+                  activeMethod === key
+                    ? 'border-blue-500 bg-blue-50 shadow-lg'
+                    : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                }`}
+              >
+                <Icon className={`h-8 w-8 mb-3 ${
+                  activeMethod === key ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'
+                }`} />
+                <div className={`font-semibold mb-1 ${
+                  activeMethod === key ? 'text-blue-900' : 'text-gray-900'
+                }`}>
+                  {label}
+                </div>
+                <div className="text-sm text-gray-500">{desc}</div>
+              </button>
+            ))}
           </div>
         </div>
 
         {/* Main Detection Interface */}
         <div className="grid lg:grid-cols-4 gap-6">
-          {/* Configuration Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sticky top-6">
-              <div className="flex items-center mb-4">
-                <Cog6ToothIcon className="h-5 w-5 text-gray-600 mr-2" />
-                <h4 className="font-semibold text-gray-900">Detection Settings</h4>
-              </div>
 
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Confidence: {confidenceThreshold}
-                  </label>
-                  <input
-                    type="range"
-                    min="0.1"
-                    max="1.0"
-                    step="0.05"
-                    value={confidenceThreshold}
-                    onChange={(e) => setConfidenceThreshold(parseFloat(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Min Object Size: {minObjectSize}%
-                  </label>
-                  <input
-                    type="range"
-                    min="0.5"
-                    max="5.0"
-                    step="0.1"
-                    value={minObjectSize}
-                    onChange={(e) => setMinObjectSize(parseFloat(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                  />
-                </div>
-
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="filter-low-confidence"
-                    checked={filterLowConfidenceGarbage}
-                    onChange={(e) => setFilterLowConfidenceGarbage(e.target.checked)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="filter-low-confidence" className="ml-2 text-sm text-gray-700">
-                    Filter Low Confidence
-                  </label>
-                </div>
-
-                {activeMethod === 'video' && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Processing Speed
-                    </label>
-                    <select
-                      value={videoSpeedOption}
-                      onChange={(e) => setVideoSpeedOption(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="fast">Fast (Every 10th frame)</option>
-                      <option value="balanced">Balanced (Every 5th frame)</option>
-                      <option value="detailed">Detailed (Every 2nd frame)</option>
-                    </select>
+              {/* Configuration Sidebar */}
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sticky top-6">
+                  <div className="flex items-center mb-4">
+                    <Cog6ToothIcon className="h-5 w-5 text-gray-600 mr-2" />
+                    <h4 className="font-semibold text-gray-900">Detection Settings</h4>
                   </div>
-                )}
-              </div>
-            </div>
-          </div>
 
-          {/* Detection Interface */}
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-              {/* Interface Header */}
-              <div className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-100">
-                <h4 className="text-lg font-semibold text-gray-900 capitalize">
-                  {activeMethod === 'camera' ? 'Live Camera Capture' :
-                   activeMethod === 'upload' ? 'Image Upload' :
-                   activeMethod === 'video' ? 'Video Analysis' :
-                   'Bulk Processing'}
-                </h4>
-              </div>
-
-              <div className="p-6">
-                {/* Camera Interface */}
-                {activeMethod === 'camera' && (
                   <div className="space-y-6">
-                    {!cameraStream && !capturedImage && (
-                      <div className="text-center py-12">
-                        <CameraIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                        <button
-                          onClick={startCamera}
-                          className="btn-primary inline-flex items-center space-x-2"
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Confidence: {confidenceThreshold}
+                      </label>
+                      <input
+                        type="range"
+                        min="0.1"
+                        max="1.0"
+                        step="0.05"
+                        value={confidenceThreshold}
+                        onChange={(e) => setConfidenceThreshold(parseFloat(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Min Object Size: {minObjectSize}%
+                      </label>
+                      <input
+                        type="range"
+                        min="0.5"
+                        max="5.0"
+                        step="0.1"
+                        value={minObjectSize}
+                        onChange={(e) => setMinObjectSize(parseFloat(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                      />
+                    </div>
+
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="filter-low-confidence"
+                        checked={filterLowConfidenceGarbage}
+                        onChange={(e) => setFilterLowConfidenceGarbage(e.target.checked)}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor="filter-low-confidence" className="ml-2 text-sm text-gray-700">
+                        Filter Low Confidence
+                      </label>
+                    </div>
+
+                    {activeMethod === 'video' && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Processing Speed
+                        </label>
+                        <select
+                          value={videoSpeedOption}
+                          onChange={(e) => setVideoSpeedOption(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         >
-                          <CameraIcon className="h-5 w-5" />
-                          <span>Start Camera</span>
-                        </button>
+                          <option value="fast">Fast (Every 10th frame)</option>
+                          <option value="balanced">Balanced (Every 5th frame)</option>
+                          <option value="detailed">Detailed (Every 2nd frame)</option>
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Detection Interface */}
+              <div className="lg:col-span-3">
+                <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+                  {/* Interface Header */}
+                  <div className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-100">
+                    <h4 className="text-lg font-semibold text-gray-900 capitalize">
+                      {activeMethod === 'camera' ? 'Live Camera Capture' :
+                       activeMethod === 'upload' ? 'Image Upload' :
+                       activeMethod === 'video' ? 'Video Analysis' :
+                       'Bulk Processing'}
+                    </h4>
+                  </div>
+
+                  <div className="p-6">
+                    {/* Camera Interface */}
+                    {activeMethod === 'camera' && (
+                      <div className="space-y-6">
+                        {!cameraStream && !capturedImage && (
+                          <div className="text-center py-12">
+                            <CameraIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                            <button
+                              onClick={startCamera}
+                              className="btn-primary inline-flex items-center space-x-2"
+                            >
+                              <CameraIcon className="h-5 w-5" />
+                              <span>Start Camera</span>
+                            </button>
+                          </div>
+                        )}
+
+                        {cameraStream && !capturedImage && (
+                          <div className="space-y-4">
+                            <div className="relative rounded-lg overflow-hidden bg-black">
+                              <video
+                                ref={videoRef}
+                                autoPlay
+                                playsInline
+                                className="w-full h-auto max-h-96 object-cover"
+                              />
+                            </div>
+                            <div className="flex justify-center space-x-4">
+                              <button
+                                onClick={capturePhoto}
+                                className="btn-primary inline-flex items-center space-x-2"
+                              >
+                                <PhotoIcon className="h-5 w-5" />
+                                <span>Capture Photo</span>
+                              </button>
+                              <button
+                                onClick={stopCamera}
+                                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {capturedImage && (
+                          <div className="space-y-4">
+                            <div className="relative rounded-lg overflow-hidden">
+                              <img
+                                src={capturedImage}
+                                alt="Captured"
+                                className="w-full h-auto max-h-96 object-cover"
+                              />
+                            </div>
+                            <div className="flex justify-center space-x-4">
+                              <button
+                                onClick={() => {
+                                  fetch(capturedImage)
+                                    .then(res => res.blob())
+                                    .then(blob => {
+                                      const file = new File([blob], 'captured.jpg', { type: 'image/jpeg' })
+                                      handleImageUpload(file)
+                                    })
+                                }}
+                                disabled={isDetecting}
+                                className="btn-primary"
+                              >
+                                {isDetecting ? 'Analyzing...' : 'Analyze Image'}
+                              </button>
+                              <button
+                                onClick={startCamera}
+                                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                              >
+                                Take Another
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                        
+                        <canvas ref={canvasRef} className="hidden" />
                       </div>
                     )}
 
-                    {cameraStream && !capturedImage && (
-                      <div className="space-y-4">
-                        <div className="relative rounded-lg overflow-hidden bg-black">
-                          <video
-                            ref={videoRef}
-                            autoPlay
-                            playsInline
-                            className="w-full h-auto max-h-96 object-cover"
-                          />
-                        </div>
-                        <div className="flex justify-center space-x-4">
-                          <button
-                            onClick={capturePhoto}
-                            className="btn-primary inline-flex items-center space-x-2"
-                          >
-                            <PhotoIcon className="h-5 w-5" />
-                            <span>Capture Photo</span>
-                          </button>
-                          <button
-                            onClick={stopCamera}
-                            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {capturedImage && (
-                      <div className="space-y-4">
-                        <div className="relative rounded-lg overflow-hidden">
-                          <img
-                            src={capturedImage}
-                            alt="Captured"
-                            className="w-full h-auto max-h-96 object-cover"
-                          />
-                        </div>
-                        <div className="flex justify-center space-x-4">
-                          <button
-                            onClick={() => {
-                              fetch(capturedImage)
-                                .then(res => res.blob())
-                                .then(blob => {
-                                  const file = new File([blob], 'captured.jpg', { type: 'image/jpeg' })
-                                  handleImageUpload(file)
-                                })
+                    {/* Upload Interface */}
+                    {activeMethod === 'upload' && (
+                      <div className="space-y-6">
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-gray-400 transition-colors">
+                          <PhotoIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                          <h4 className="text-lg font-medium text-gray-900 mb-2">Upload an Image</h4>
+                          <p className="text-gray-500 mb-4">Drop your image here or click to browse</p>
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0]
+                              if (file) handleImageUpload(file)
                             }}
+                            className="hidden"
+                          />
+                          <button
+                            onClick={() => fileInputRef.current?.click()}
                             disabled={isDetecting}
                             className="btn-primary"
                           >
-                            {isDetecting ? 'Analyzing...' : 'Analyze Image'}
+                            {isDetecting ? 'Analyzing...' : 'Choose Image'}
                           </button>
-                          <button
-                            onClick={startCamera}
-                            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Video Interface */}
+                    {activeMethod === 'video' && (
+                      <div className="space-y-6">
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-gray-400 transition-colors">
+                          <VideoCameraIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                          <h4 className="text-lg font-medium text-gray-900 mb-2">Upload a Video</h4>
+                          <p className="text-gray-500 mb-4">Analyze video for garbage detection</p>
+                          <input
+                            type="file"
+                            accept="video/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0]
+                              if (file) handleVideoUpload(file)
+                            }}
+                            className="hidden"
+                            id="video-upload"
+                          />
+                          <label
+                            htmlFor="video-upload"
+                            className={`btn-primary cursor-pointer ${isDetecting ? 'opacity-50 cursor-not-allowed' : ''}`}
                           >
-                            Take Another
+                            {isDetecting ? 'Processing...' : 'Choose Video'}
+                          </label>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Bulk Interface */}
+                    {activeMethod === 'bulk' && (
+                      <div className="space-y-6">
+                        <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
+                          <div className="flex items-start space-x-3">
+                            <FolderIcon className="h-6 w-6 text-blue-600 mt-0.5" />
+                            <div>
+                              <h4 className="font-medium text-blue-900">Bulk Processing</h4>
+                              <p className="text-blue-700 text-sm mt-1">
+                                Process all images in the v2_test_img directory
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="text-center">
+                          <button
+                            onClick={handleBulkProcessing}
+                            disabled={isDetecting}
+                            className="btn-primary"
+                          >
+                            {isDetecting ? 'Processing Images...' : 'Start Bulk Processing'}
                           </button>
                         </div>
                       </div>
                     )}
-                    
-                    <canvas ref={canvasRef} className="hidden" />
-                  </div>
-                )}
 
-                {/* Upload Interface */}
-                {activeMethod === 'upload' && (
-                  <div className="space-y-6">
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-gray-400 transition-colors">
-                      <PhotoIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                      <h4 className="text-lg font-medium text-gray-900 mb-2">Upload an Image</h4>
-                      <p className="text-gray-500 mb-4">Drop your image here or click to browse</p>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0]
-                          if (file) handleImageUpload(file)
-                        }}
-                        className="hidden"
-                      />
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={isDetecting}
-                        className="btn-primary"
-                      >
-                        {isDetecting ? 'Analyzing...' : 'Choose Image'}
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Video Interface */}
-                {activeMethod === 'video' && (
-                  <div className="space-y-6">
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-gray-400 transition-colors">
-                      <VideoCameraIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                      <h4 className="text-lg font-medium text-gray-900 mb-2">Upload a Video</h4>
-                      <p className="text-gray-500 mb-4">Analyze video for garbage detection</p>
-                      <input
-                        type="file"
-                        accept="video/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0]
-                          if (file) handleVideoUpload(file)
-                        }}
-                        className="hidden"
-                        id="video-upload"
-                      />
-                      <label
-                        htmlFor="video-upload"
-                        className={`btn-primary cursor-pointer ${isDetecting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      >
-                        {isDetecting ? 'Processing...' : 'Choose Video'}
-                      </label>
-                    </div>
-                  </div>
-                )}
-
-                {/* Bulk Interface */}
-                {activeMethod === 'bulk' && (
-                  <div className="space-y-6">
-                    <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
-                      <div className="flex items-start space-x-3">
-                        <FolderIcon className="h-6 w-6 text-blue-600 mt-0.5" />
-                        <div>
-                          <h4 className="font-medium text-blue-900">Bulk Processing</h4>
-                          <p className="text-blue-700 text-sm mt-1">
-                            Process all images in the v2_test_img directory
-                          </p>
-                        </div>
+                    {/* Loading State */}
+                    {isDetecting && (
+                      <div className="mt-6">
+                        {activeMethod === 'video' ? (
+                          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-200">
+                            <div className="mb-4">
+                              <div className="flex items-center justify-between mb-2">
+                                <h4 className="text-lg font-semibold text-gray-900">Processing Video</h4>
+                                <span className="text-lg font-bold text-blue-600">{Math.round(videoProgress)}%</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                                <div 
+                                  className="bg-gradient-to-r from-blue-500 to-purple-500 h-4 rounded-full transition-all duration-500 ease-out"
+                                  style={{ width: `${videoProgress}%` }}
+                                />
+                              </div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-gray-700 mb-3 font-medium">{videoProcessingStatus}</div>
+                              <div className="flex items-center justify-center space-x-2">
+                                <div className="animate-pulse w-3 h-3 bg-blue-500 rounded-full"></div>
+                                <div className="animate-pulse w-3 h-3 bg-purple-500 rounded-full" style={{ animationDelay: '0.2s' }}></div>
+                                <div className="animate-pulse w-3 h-3 bg-blue-500 rounded-full" style={{ animationDelay: '0.4s' }}></div>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center py-8 bg-gray-50 rounded-lg">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                            <span className="ml-3 text-gray-700 font-medium">Analyzing...</span>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                    
-                    <div className="text-center">
-                      <button
-                        onClick={handleBulkProcessing}
-                        disabled={isDetecting}
-                        className="btn-primary"
-                      >
-                        {isDetecting ? 'Processing Images...' : 'Start Bulk Processing'}
-                      </button>
-                    </div>
-                  </div>
-                )}
+                    )}
 
-                {/* Loading State */}
-                {isDetecting && (
-                  <div className="mt-6">
-                    {activeMethod === 'video' ? (
-                      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-200">
-                        <div className="mb-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-lg font-semibold text-gray-900">Processing Video</h4>
-                            <span className="text-lg font-bold text-blue-600">{Math.round(videoProgress)}%</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-                            <div 
-                              className="bg-gradient-to-r from-blue-500 to-purple-500 h-4 rounded-full transition-all duration-500 ease-out"
-                              style={{ width: `${videoProgress}%` }}
-                            />
+                    {/* Error Display */}
+                    {error && (
+                      <div className="mt-6 bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div className="flex">
+                          <ExclamationTriangleIcon className="h-5 w-5 text-red-400" />
+                          <div className="ml-3">
+                            <h3 className="text-sm font-medium text-red-800">Error</h3>
+                            <p className="text-sm text-red-700 mt-1">{error}</p>
                           </div>
                         </div>
-                        <div className="text-center">
-                          <div className="text-gray-700 mb-3 font-medium">{videoProcessingStatus}</div>
-                          <div className="flex items-center justify-center space-x-2">
-                            <div className="animate-pulse w-3 h-3 bg-blue-500 rounded-full"></div>
-                            <div className="animate-pulse w-3 h-3 bg-purple-500 rounded-full" style={{ animationDelay: '0.2s' }}></div>
-                            <div className="animate-pulse w-3 h-3 bg-blue-500 rounded-full" style={{ animationDelay: '0.4s' }}></div>
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center py-8 bg-gray-50 rounded-lg">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                        <span className="ml-3 text-gray-700 font-medium">Analyzing...</span>
                       </div>
                     )}
                   </div>
-                )}
-
-                {/* Error Display */}
-                {error && (
-                  <div className="mt-6 bg-red-50 border border-red-200 rounded-lg p-4">
-                    <div className="flex">
-                      <ExclamationTriangleIcon className="h-5 w-5 text-red-400" />
-                      <div className="ml-3">
-                        <h3 className="text-sm font-medium text-red-800">Error</h3>
-                        <p className="text-sm text-red-700 mt-1">{error}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             </div>
-          </div>
+          {/* </div> */}
         </div>
-      </div>
-
+            
       {/* Save Session Dialog */}
       {showSaveDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import SimpleHotspotMap from '@/components/SimpleHotspotMap'
 import AreaLeaderboard from '@/components/AreaLeaderboard'
 import PlaceComparison from '@/components/PlaceComparison'
 import LiveDetection from '@/components/LiveDetection'
 import FloatingDelegationDialog from '@/components/FloatingDelegationDialog'
+import InteractiveTutorial from '@/components/InteractiveTutorial'
 import { useData } from '@/contexts/DataContext'
 import { exportToCSV, generatePDFReport } from '@/utils/exportUtils'
 import { 
@@ -25,8 +26,30 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('detection')
   const [timeFilter, setTimeFilter] = useState<'24h' | '7d' | '30d'>('24h')
   const [showDelegationDialog, setShowDelegationDialog] = useState(false)
+  const [showTutorial, setShowTutorial] = useState(false)
+  const [hasSeenTutorial, setHasSeenTutorial] = useState(false)
   const { areas, getTotalStats } = useData()
   const stats = getTotalStats()
+
+  // Check if user has seen tutorial
+  useEffect(() => {
+    const tutorialSeen = localStorage.getItem('swach-tutorial-seen')
+    if (!tutorialSeen) {
+      setShowTutorial(true)
+    } else {
+      setHasSeenTutorial(true)
+    }
+  }, [])
+
+  const handleTutorialComplete = () => {
+    setShowTutorial(false)
+    setHasSeenTutorial(true)
+    localStorage.setItem('swach-tutorial-seen', 'true')
+  }
+
+  const startTutorial = () => {
+    setShowTutorial(true)
+  }
 
   // Export functions
   const handleCSVExport = () => {
@@ -68,78 +91,92 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 shadow-sm">
+      <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-swach-500 to-swach-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">S</span>
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-white font-bold text-sm">S</span>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">SWACH Dashboard</h1>
-                <p className="text-sm text-gray-600">Smart Waste & Cleanliness Hygiene</p>
+                <h1 className="text-xl font-bold text-gray-900">SWACH Dashboard</h1>
+                <p className="text-xs text-gray-500">Smart Waste & Cleanliness Hygiene</p>
               </div>
             </div>
 
-            {/* Tab Navigation */}
-            <nav className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
-              <button
-                onClick={() => setActiveTab('dashboard')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeTab === 'dashboard'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Analytics Dashboard
-                {areas.length > 0 && (
-                  <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs bg-swach-100 text-swach-800">
-                    {areas.length}
-                  </span>
-                )}
-              </button>
-              <button
-                onClick={() => setActiveTab('detection')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeTab === 'detection'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Live Detection
-              </button>
-            </nav>
+            {/* Navigation and Controls */}
+            <div className="flex items-center space-x-6">
+              {/* Tutorial Button */}
+              {hasSeenTutorial && (
+                <button
+                  onClick={startTutorial}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                >
+                  Help & Tutorial
+                </button>
+              )}
 
-            {/* Export Buttons - Show only on dashboard tab with data */}
-            {activeTab === 'dashboard' && areas.length > 0 && (
-              <div className="flex space-x-2">
+              {/* Tab Navigation */}
+              <nav className="flex space-x-1 bg-gray-100 p-1 rounded-lg tab-navigation">
                 <button
-                  onClick={handleCSVExport}
-                  className="inline-flex items-center px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
+                  onClick={() => setActiveTab('dashboard')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === 'dashboard'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
                 >
-                  <DocumentArrowDownIcon className="h-4 w-4 mr-1" />
-                  CSV
+                  Analytics Dashboard
+                  {areas.length > 0 && (
+                    <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs bg-swach-100 text-swach-800">
+                      {areas.length}
+                    </span>
+                  )}
                 </button>
                 <button
-                  onClick={handlePDFExport}
-                  className="inline-flex items-center px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
+                  onClick={() => setActiveTab('detection')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors detection-tab ${
+                    activeTab === 'detection'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
                 >
-                  <ChartBarIcon className="h-4 w-4 mr-1" />
-                  PDF Report
+                  Live Detection
                 </button>
-              </div>
-            )}
+              </nav>
+
+              {/* Export Buttons - Show only on dashboard tab with data */}
+              {activeTab === 'dashboard' && areas.length > 0 && (
+                <div className="flex space-x-2 export-buttons">
+                  <button
+                    onClick={handleCSVExport}
+                    className="inline-flex items-center px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    <DocumentArrowDownIcon className="h-4 w-4 mr-1" />
+                    CSV
+                  </button>
+                  <button
+                    onClick={handlePDFExport}
+                    className="inline-flex items-center px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    <ChartBarIcon className="h-4 w-4 mr-1" />
+                    PDF Report
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 min-h-screen">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 min-h-screen main-container">
         {/* Dashboard Tab */}
         {activeTab === 'dashboard' && (
           <div className="space-y-6">
             {/* Enhanced Stats Overview */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stats-grid">
               <div className="interactive-card gradient-bg-primary text-white p-4 rounded-2xl">
                 <div className="flex items-center justify-between">
                   <div>
@@ -194,7 +231,7 @@ export default function Dashboard() {
               {/* Left Column */}
               <div className="xl:col-span-2 space-y-6">
                 {/* Hotspot Map */}
-                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
+                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow hotspot-map-section">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold text-gray-900 flex items-center">
                       <MapPinIcon className="h-6 w-6 text-blue-600 mr-2" />
@@ -210,7 +247,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Place Comparison */}
-                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 comparison-section">
                   <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
                     <ChartBarIcon className="h-6 w-6 text-purple-600 mr-2" />
                     <span>Smart Comparison</span>
@@ -229,7 +266,7 @@ export default function Dashboard() {
               {/* Right Column */}
               <div className="space-y-6">
                 {/* Top Performers */}
-                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 top-performers-section">
                   <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
                     <TrophyIcon className="h-6 w-6 text-yellow-600 mr-2" />
                     <span>Top Performers</span>
@@ -245,7 +282,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Red Flag Areas */}
-                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 needs-attention-section">
                   <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
                     <ExclamationTriangleIcon className="h-6 w-6 text-red-600 mr-2" />
                     <span>Needs Attention</span>
@@ -293,8 +330,8 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Floating Team Delegation Button */}
-        <div className="group fixed bottom-6 right-6 z-40">
+        {/* Floating Team Management Button */}
+        <div className="group fixed bottom-6 right-6 z-40 delegation-button">
           <button
             onClick={() => setShowDelegationDialog(true)}
             className="w-14 h-14 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 flex items-center justify-center"
@@ -304,7 +341,7 @@ export default function Dashboard() {
           
           {/* Tooltip */}
           <div className="absolute bottom-16 right-0 bg-gray-900 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-            Team Delegation
+            Team Management
             <div className="absolute top-full right-6 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
           </div>
         </div>
@@ -314,6 +351,13 @@ export default function Dashboard() {
           isOpen={showDelegationDialog}
           onClose={() => setShowDelegationDialog(false)}
           areas={areas}
+        />
+
+        {/* Interactive Tutorial */}
+        <InteractiveTutorial
+          isOpen={showTutorial}
+          onClose={() => setShowTutorial(false)}
+          onComplete={handleTutorialComplete}
         />
       </main>
     </div>
