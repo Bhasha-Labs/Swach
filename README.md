@@ -1,119 +1,97 @@
-# SWACH_V1: Garbage Detection Model Report
+# SWACH - Smart Garbage Detection App
 
-This document outlines the specifications, training configuration, and performance results for the SWACH_V1 garbage detection model.
+## Public Code Repository
+**GitHub Repository:** https://github.com/visheshyadav/swch-test
 
----
+## One-Page Summary of Prototype
 
-### 1. Model Specifications
+SWACH is an intelligent garbage detection system that uses computer vision and machine learning to assess environmental cleanliness through a quantifiable **Swacchta Index (SI)**. The application provides real-time analysis of images and videos to detect various types of garbage and generate standardized cleanliness scores from 0-100.
 
-- **Architecture:** YOLOv8s (small variant)
-- **Parameters:** 11,137,922
-- **Gradients:** 11,137,906
-- **Computational Load:** 28.7 GFLOPs
-- **Input Size:** 640×640 pixels
-- **Classes:** 6 garbage categories (overridden from default COCO 80-class setup)
+### Key Features and Functionalities
 
----
+- **Real-time Garbage Detection**: Camera-based live detection with instant analysis
+- **Multi-format Support**: Image upload, video processing, and bulk image analysis
+- **Swacchta Index Calculation**: Mathematical algorithm converting detection data into standardized cleanliness scores
+- **Interactive Dashboard**: Modern web interface with location tracking and session management
+- **Advanced Configuration**: Customizable confidence thresholds, object size filters, and processing options
+- **Geographic Integration**: Location-based data collection with coordinate tracking
+- **Session Management**: Save and manage detection sessions for different areas
+- **Professional Reporting**: Clean interface suitable for municipal and environmental monitoring
 
-### 2. Training Configuration
+### Core Problem Being Addressed
 
-- **Epochs:** 100
-- **Batch Size:** 16
-- **Device:** NVIDIA Tesla T4 GPU (CUDA)
-- **Optimizer:** AdamW
-- **Learning Rate (lr0):** 0.001
-- **Momentum:** 0.9
-- **Weight Decay:** 0.0005
-- **Data Augmentation:**
-    - **Albumentations:** Blur, MedianBlur, CLAHE, Grayscale conversion
-    - **Mosaic Augmentation:** Enabled until epoch 90 (improves small-object detection)
-- **Mixed Precision:** AMP (Automatic Mixed Precision) ✅
-- **Loss Functions:**
-    - `box_loss`: Bounding box regression
-    - `cls_loss`: Class prediction
-    - `dfl_loss`: Distribution Focal Loss (for localization accuracy)
+Urban areas worldwide struggle with garbage management and environmental monitoring. Traditional methods rely on manual inspection, which is:
+- Time-consuming and labor-intensive
+- Inconsistent in assessment criteria
+- Difficult to scale across large areas
+- Lacks standardized measurement systems
 
----
+SWACH addresses these challenges by providing:
+- Automated, consistent garbage detection
+- Standardized cleanliness scoring system
+- Scalable analysis for municipal areas
+- Data-driven environmental monitoring
 
-### 3. Dataset
+### Clear Overview of Prototype/Idea
 
-- **Training Images:** 1,077 (+15 background)
-- **Validation Images:** 157 (+1 background)
-- **Instances:** 587 annotated objects
-- **Class Distribution:** `garbage`, `sampah-detection`, `trash`, and 3 additional classes
+SWACH combines YOLO-based object detection with a sophisticated mathematical algorithm to create the Swacchta Index. The system processes visual data to identify garbage objects, calculates their impact based on type, size, confidence, and density, then generates a standardized score.
 
----
+**Core Algorithm:**
+```
+Swacchta Index (SI) = max(0, 100 - Total_Impact_Score)
+```
 
-### 4. Performance Metrics
+The Total_Impact_Score considers:
+- Base impact from detected objects (confidence × severity × size)
+- Coverage penalty based on area covered by garbage
+- Density penalty for object concentration
+- Large object penalties for significant visual pollution
+- Additional penalties for pollution variety and visual density
 
-The best model validation results are saved as `swach_v1.pt`.
+**Grading Scale:**
+- 95-100: A+ (Excellent - Pristine)
+- 85-94: A (Very Good - Clean)
+- 75-84: B+ (Good - Mostly Clean)
+- 65-74: B (Fair - Some Issues)
+- 55-64: C+ (Moderate - Noticeable Litter)
+- 45-54: C (Poor - Significant Garbage)
+- 35-44: D+ (Bad - Heavy Pollution)
+- 25-34: D (Very Bad - Severe Issues)
+- 15-24: F+ (Critical - Environmental Hazard)
+- 0-14: F (Catastrophic - Immediate Action Required)
 
-#### Overall Metrics:
-| Metric    | Value |
-|-----------|-------|
-| mAP50     | 0.324 |
-| mAP50-95  | 0.197 |
-| Precision | 0.438 |
-| Recall    | 0.356 |
+## How to Run the Application
 
-#### Per-Class Results:
-| Class            | Precision | Recall | mAP50 |
-|------------------|-----------|--------|-------|
-| garbage          | 0.155     | 0.597  | 0.173 |
-| sampah-detection | 0.447     | 0.676  | 0.599 |
-| trash            | 0.459     | 0.500  | 0.662 |
-| Class 0 (Unknown)| 0.128     | 0.005  | 0.187 |
+1. Clone the repository:
+```bash
+git clone https://github.com/visheshyadav/swch-test.git
+cd swch-test
+```
 
-**Key Insight:** The model excels at detecting `sampah-detection` and `trash` (mAP50 > 0.59) but struggles with `Class 0` (low recall).
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
----
+3. Navigate to the application directory:
+```bash
+cd garbage_detection_colab
+```
 
-### 5. Training Trajectory
+4. Run the Streamlit application:
+```bash
+streamlit run streamlit_app.py
+```
 
-- **Total Time:** 0.69 hours (~41 minutes)
-- **Loss Reduction:**
-    - `box_loss`: 1.656 → 0.623 (↓62.4%)
-    - `cls_loss`: 3.373 → 0.427 (↓87.3%)
-- **mAP50 Progress:** Started at 0.068 (Epoch 1), peaked at 0.323 (Epoch 58).
-- **Critical Improvement:** Epoch 58 saw a 52% mAP50 jump (0.222 → 0.323) due to mosaic augmentation effects.
+The application will be available at `http://localhost:8501` in your web browser.
 
----
+## Technical Implementation
 
-### 6. Techniques Applied
+The prototype uses:
+- **Frontend**: Next.js with TypeScript for the web dashboard
+- **Backend**: Python with Streamlit for the core application
+- **Computer Vision**: YOLO v8 for object detection
+- **Data Processing**: Custom algorithms for Swacchta Index calculation
+- **Geographic Data**: Location tracking and coordinate management
 
-- **Transfer Learning:** Initialized with `yolov8s.pt` COCO weights (349/355 layers transferred).
-- **Dynamic Learning Rate:**
-    - **Warmup:** 3 epochs (bias LR: 0.1 → 0.001).
-    - **Cosine annealing** (automated by YOLOv8).
-- **Advanced Augmentation:**
-    - **Mosaic:** 90% of training (random image stitching).
-    - **Geometric:** FlipLR (50%), translation, scaling.
-- **Efficiency Optimizations:**
-    - AMP for FP16/FP32 hybrid training → faster computation.
-    - Dataloader workers: 8 (parallel data loading).
-
----
-
-### 7. Deployment Readiness
-
-- **Output Format:** TorchScript-optimized (22.5MB stripped weights).
-- **Inference Speed:**
-    - Preprocess: 0.3 ms/image
-    - Inference: 5.8 ms/image (Tesla T4)
-- **Model Saved At:** `garbage_detection_training/train/weights/best.pt`
-
----
-
-### Conclusion
-
-The YOLOv8s model achieved **32.4% mAP50** on garbage detection, with strong performance on identifiable trash categories (`sampah-detection`, `trash`).
-
-To improve results:
-1.  **Address Class Imbalance:** Collect more data for low-recall classes (e.g., `Class 0`).
-2.  **Tune Augmentation:** Increase copy-paste or mixup augmentations for rare classes.
-3.  **Hyperparameter Tuning:** Adjust `cls_loss` weight to reduce false negatives.
-
-The final model is ready for deployment in roadside garbage monitoring systems.
-
----
-*Report Generated By: Vishesh Yadav @Bhasa | Date: June 30, 2025* 
+This system provides municipalities, environmental agencies, and urban planners with a standardized tool for assessing and monitoring environmental cleanliness across different areas.
