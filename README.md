@@ -44,7 +44,7 @@ SWACH combines YOLO-based object detection with a sophisticated mathematical alg
 Swacchta Index (SI) = max(0, 100 - Total_Impact_Score)
 
 ```
->to know how *Total_Impact_Score* is calculated, please refer to the [Logic_Behind_SI](Logic_Behind_SI.md)  |
+>to know how *Total_Impact_Score* is calculated, please refer to the [Logic_Behind_SI](https://github.com/Bhasha-Labs/swach/blob/main/garbage_detection_colab/Logic_Behind_SI.md)  
 
 The *Total_Impact_Score* considers:
 - Base impact from detected objects (confidence × severity × size)
