@@ -67,11 +67,7 @@ tmp/
 *.mov
 *.mkv
 
-# Model files (consider using Git LFS)
-*.pt
-*.pth
-*.h5
-*.pkl
+
 
 # Inference results
 inference_results/
