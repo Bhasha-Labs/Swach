@@ -1,4 +1,7 @@
-# SWACH - Smart Garbage Detection App
+<div align="center">
+    <img src="assets/logo.png" style="vertical-align: middle; margin-right: 0px; margin-bottom: 20px;" width="120" height="70">
+    <h1>SWACH - Smart Garbage Detection App</h1>
+</div>
 
 ## Public Code Repository
 **GitHub Repository:** https://github.com/Bhasha-Labs/swch.git
@@ -39,9 +42,11 @@ SWACH combines YOLO-based object detection with a sophisticated mathematical alg
 **Core Algorithm:**
 ```
 Swacchta Index (SI) = max(0, 100 - Total_Impact_Score)
-```
 
-The Total_Impact_Score considers:
+```
+>to know how *Total_Impact_Score* is calculated, please refer to the [Logic_Behind_SI](Logic_Behind_SI.md)  |
+
+The *Total_Impact_Score* considers:
 - Base impact from detected objects (confidence × severity × size)
 - Coverage penalty based on area covered by garbage
 - Density penalty for object concentration
@@ -84,6 +89,31 @@ streamlit run streamlit_app.py
 ```
 
 The application will be available at `http://localhost:8501` in your web browser.
+>Model Inference will look like this / scroll; down to see dashboard instead:
+![alt text](assets/model.png)
+
+
+## How to Use Interactive Dashboard and Workers Team Manager
+
+
+1. Navigate to the application directory:
+```bash
+cd swach_dashboard
+```
+
+2. Install Next.js Dependencies and pkgs:
+```bash
+npm install
+```
+
+3. Run the Next.js application:
+```bash
+npm run dev
+```
+The application will be available at `http://localhost:3000` in your web browser.
+
+>Dashboard will look like this with inbuilt tutorial:
+![alt text](assets/dashboard.png)
 
 ## Technical Implementation
 

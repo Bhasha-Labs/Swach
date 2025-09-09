@@ -1,14 +1,14 @@
-# SWACH - Smart Garbage Detection App
+# Swachta Index (SI)
 
-This Streamlit application provides real-time garbage detection with an innovative **Swacchta Index (SI)** - a quantifiable measure of environmental cleanliness.
+This document provides the mathematical foundation for the Swachta Index (SI) - a quantifiable measure of environmental cleanliness.
 
 ---
 
-## 🏛️ Swacchta Index (SI) - Mathematical Foundation
+## Swacchta Index (SI) - Mathematical Foundation
 
 The **Swacchta Index** is a comprehensive cleanliness metric that converts garbage detection data into a standardized score from 0-100, where 100 represents perfect cleanliness.
 
-### 📊 **Core Algorithm**
+### Core Algorithm
 
 ```
 Swacchta Index (SI) = max(0, 100 - Total_Impact_Score)
@@ -23,7 +23,7 @@ Total_Impact_Score = Base_Impact + Coverage_Penalty + Density_Penalty +
 
 ---
 
-### 🧮 **Detailed Mathematical Breakdown**
+### Detailed Mathematical Breakdown
 
 #### **1. Base Impact Calculation**
 For each detected object `i`:
@@ -89,7 +89,7 @@ Variety_Penalty = max(0, (Unique_Object_Types - 2) × 8)
 
 ---
 
-### 📝 **Example Calculation**
+### **Example Calculation**
 
 **Scenario:** Tokyo street with 3 detected objects
 - Object 1: `trash`, confidence=0.8, area=2% of image
@@ -145,7 +145,7 @@ Grade: F (Catastrophic)
 
 ---
 
-### 🎯 **Grading Scale**
+###  **Grading Scale**
 
 | Score Range | Grade | Description | Color |
 |-------------|-------|-------------|-------|
@@ -162,7 +162,7 @@ Grade: F (Catastrophic)
 
 ---
 
-### 🔬 **Algorithm Features**
+###  **Algorithm Features**
 
 1. **Area-Weighted**: Larger garbage has exponentially more impact
 2. **Confidence-Sensitive**: Higher confidence detections weighted more heavily  
@@ -174,3 +174,5 @@ Grade: F (Catastrophic)
 This mathematical foundation ensures the Swacchta Index provides meaningful, policy-relevant cleanliness assessments for urban environmental monitoring.
 
 --- 
+
+### Blame : vishesh @bhasha-labs
