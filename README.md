@@ -1,7 +1,7 @@
 # SWACH - Smart Garbage Detection App
 
 ## Public Code Repository
-**GitHub Repository:** https://github.com/visheshyadav/swch-test
+**GitHub Repository:** https://github.com/Bhasha-Labs/swch.git
 
 ## One-Page Summary of Prototype
 
