@@ -1,6 +1,6 @@
 .DS_Store
 *.zip
-*.png
+# *.png
 *.jpeg
 *.jpg
 /swach-dashboard/temp
@@ -76,3 +76,4 @@ results/
 # Test images (if they're large)
 test_images/
 v2_test_img/
+/mumbai_slum_video
