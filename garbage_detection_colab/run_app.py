@@ -28,22 +28,38 @@ def main():
     
     print(f"✅ Found model files: {', '.join(model_files)}")
     print("🌐 Launching Streamlit app...")
-    print("   The app will open in your default web browser.")
-    print("   If not, go to: http://localhost:8501")
+    
+    # Try to find an available port
+    import socket
+    def find_free_port(start_port=8501):
+        for port in range(start_port, start_port + 10):
+            try:
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.bind(('localhost', port))
+                    return port
+            except OSError:
+                continue
+        return 8501  # fallback
+    
+    port = find_free_port()
+    print(f"   Using port: {port}")
+    print(f"   The app will open in your default web browser.")
+    print(f"   If not, go to: http://localhost:{port}")
     print()
     
     try:
-        # Launch Streamlit
+        # Launch Streamlit with available port
         subprocess.run([
             sys.executable, "-m", "streamlit", "run", "streamlit_app.py",
             "--server.headless", "false",
-            "--server.port", "8501",
+            "--server.port", str(port),
             "--browser.gatherUsageStats", "false"
         ])
     except KeyboardInterrupt:
         print("\n👋 App stopped by user.")
     except Exception as e:
         print(f"❌ Error launching app: {e}")
+        print(f"💡 Try running manually: streamlit run streamlit_app.py --server.port {port + 1}")
 
 if __name__ == "__main__":
     main() 
